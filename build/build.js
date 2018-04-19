@@ -1,16 +1,16 @@
 const path = require('path')
 
 const webpack = require('webpack')
-// 终端输出包
-const chalk = require('chalk')
-const rm = require('rimraf')
-// 终端输出包
-const ora = require('ora')
+const chalk = require('chalk') // 终端输出包 着色
+const rm = require('rimraf') // 删除功能模块
+const ora = require('ora') // 终端输出包 loading等临时状态显示
 
 const webpackConfig = require('./webpack.prod')
 
 const spinner = ora('building......')
+
 spinner.start()
+
 rm(webpackConfig.output.path, err => {
   if (err) throw err
   webpack(webpackConfig, (err, stats) => {
