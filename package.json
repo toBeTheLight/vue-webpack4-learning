@@ -1,0 +1,22 @@
+{
+  "name": "vue-webpack4",
+  "version": "1.0.0",
+  "description": "Zero-based development template of vue by webpack4",
+  "main": "''",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "webpack4",
+    "vue"
+  ],
+  "author": "''",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/toBeTheLight/vue-webpack4/issues"
+  },
+  "homepage": "https://github.com/toBeTheLight/vue-webpack4#readme",
+  "devDependencies": {
+    "webpack": "^4.6.0"
+  }
+}
