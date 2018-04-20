@@ -1,4 +1,5 @@
 const path = require('path')
+const vueLoaderConfig = require('./vue-loader')
 
 
 module.exports = {
@@ -13,5 +14,18 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: "[name]-[hash:7].js"
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: vueLoaderConfig
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader'
+      }
+    ]
   }
 }

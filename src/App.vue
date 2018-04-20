@@ -1,5 +1,5 @@
 <template>
-  <div>{{msg}}</div>
+  <div class="app">{{msg}}</div>
 </template>
 
 <script>
@@ -12,5 +12,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped lang="less">
+.app {
+  background-color: royalblue;
+}
 </style>

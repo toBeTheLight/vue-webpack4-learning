@@ -5,16 +5,7 @@ const path = require('path')
 
 module.exports = merge(webpackBaseConfig, {
   module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader'
-      }
-    ]
+
   },
   plugins: [
     new HtmlWebpackPlugin({
