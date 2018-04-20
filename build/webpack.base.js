@@ -1,6 +1,6 @@
 const path = require('path')
 const vueLoaderConfig = require('./vue-loader')
-
+const utils = require('./utils')
 
 module.exports = {
   /**
@@ -25,7 +25,12 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader'
-      }
+      },
+      ...utils.styleLoaders({
+        sourceMap: true,
+        extract: true,
+        usePostCSS: true
+      }),
     ]
   }
 }

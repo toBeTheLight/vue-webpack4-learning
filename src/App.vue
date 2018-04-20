@@ -15,5 +15,6 @@ export default {
 <style scoped lang="less">
 .app {
   background-color: royalblue;
+  box-shadow: 1px 1px 1px black;
 }
 </style>
