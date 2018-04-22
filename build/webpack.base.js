@@ -19,6 +19,11 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
+        /**
+         * loader配置的几种写法: https://www.bilibili.com/bangumi/play/ss12432
+         * 单个：loader + options或use: 字符串
+         * 多个：use/loaders: [string|[]单个]
+         */
         loader: 'vue-loader',
         options: vueLoaderConfig
       },
