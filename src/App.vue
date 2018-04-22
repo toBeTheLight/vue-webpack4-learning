@@ -1,5 +1,8 @@
 <template>
-  <div class="app">{{msg}}</div>
+  <div class="app">
+    <p>{{msg}}</p>
+    <img src="./assets/cat.png" alt="">
+  </div>
 </template>
 
 <script>

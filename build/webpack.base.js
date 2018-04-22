@@ -31,6 +31,30 @@ module.exports = {
         extract: true,
         usePostCSS: true
       }),
+      {
+        test: /\.(png|jpg|jpeg|gif|svg)(\?.*)?$/, // 末尾\?.*匹配带?资源路径，css字体配置中可能带版本信息
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'img/[name].[hash:7].[ext]'
+        }
+      },
+      {
+        test: /\.(mp4|mp3|wav|webm|ogg|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name].[hash:7].[ext]',
+        }
+      },
+      {
+        test: /\.(woff2|woff|eot|ttf|otf)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'fonts/[name].[hash:7].[ext]',
+        }
+      }
     ]
   }
 }
