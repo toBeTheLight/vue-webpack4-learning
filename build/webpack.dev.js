@@ -8,6 +8,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = merge(baseWebpackConfig, {
+  /**
+   * development模式下默认启用这些插件
+   * NamedChunksPlugin  
+   * NamedModulesPlugin // 显示模块的相对路径
+   */
   mode: 'development',
   // these devServer options should be customized in /config/index.js
   devServer: {
@@ -23,17 +28,19 @@ module.exports = merge(baseWebpackConfig, {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "[name].css",
-      chunkFilename: "[id].css"
+      filename: "[name]-[contenthash].css",
+      chunkFilename: "[id]-[contenthash].css"
     }),
     new webpack.HotModuleReplacementPlugin(),
-    // new webpack.NamedModulesPlugin(), mode:development下自动启用
+    /**
+     * 对应production下HashedModuleIdsPlugin插件
+     * 使用路径做模块标识
+     */
+    // new webpack.NamedModulesPlugin()
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, '../dist/index.html'),// 文件写入路径
       template: path.join(__dirname, '../src/index.html'),// 模板文件路径
       inject: true
     }),
-    // copy custom static assets
   ]
 })
-

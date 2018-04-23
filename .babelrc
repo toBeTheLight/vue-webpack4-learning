@@ -1,3 +1,12 @@
 {
-  "presets": ["env"]
+  "presets": [
+    [
+      "env", {
+        "modules": false
+      }
+    ]
+  ],
+  "plugins": [
+    "dynamic-import-node"
+  ]
 }

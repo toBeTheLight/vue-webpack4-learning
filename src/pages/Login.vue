@@ -1,15 +1,14 @@
 <template>
 <div>
   <TotalHeader />
-  <p>login</p>
+  <p>It's login</p>
 </div>
 </template>
 
 <script>
-import TotalHeader from '../cmpts/TotalHeader.vue'
 export default {
   components: {
-    TotalHeader
+    TotalHeader: () => import('../cmpts/TotalHeader.vue')
   }
 }
 </script>

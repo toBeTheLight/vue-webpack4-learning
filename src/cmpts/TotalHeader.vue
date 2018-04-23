@@ -1,10 +1,9 @@
 <template>
-  <header class="total-header"></header>
+  <header class="total-header">header</header>
 </template>
 
 <script>
 export default {
-
 }
 </script>
 
