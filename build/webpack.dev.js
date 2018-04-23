@@ -27,7 +27,7 @@ module.exports = merge(baseWebpackConfig, {
       chunkFilename: "[id].css"
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(),
+    // new webpack.NamedModulesPlugin(), mode:development下自动启用
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, '../dist/index.html'),// 文件写入路径
       template: path.join(__dirname, '../src/index.html'),// 模板文件路径

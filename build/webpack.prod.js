@@ -23,13 +23,13 @@ module.exports = merge(webpackBaseConfig, {
    */
   optimization: {
     splitChunks: {
-      chunks: "all",
-      minSize: 30000,
-      minChunks: 1,
-      maxAsyncRequests: 5,
-      maxInitialRequests: 3,
-      automaticNameDelimiter: '~',
-      name: true,
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          chunks: "all"
+        }
+      }
     },
     runtimeChunk: true
   }
