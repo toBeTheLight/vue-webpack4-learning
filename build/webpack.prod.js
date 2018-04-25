@@ -19,6 +19,14 @@ module.exports = merge(webpackBaseConfig, {
    * process.env.NODE_ENV 的值设为 production
    */
   mode: 'production',
+  output: {
+    /**
+     * development下HotModuleReplacement下文件名无法使用hash，
+     * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
+     */
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[id].[chunkhash].js'
+  },
   plugins: [
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, '../dist/index.html'),// 文件写入路径

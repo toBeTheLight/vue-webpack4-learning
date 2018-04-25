@@ -14,6 +14,14 @@ module.exports = merge(baseWebpackConfig, {
    * NamedModulesPlugin // 显示模块的相对路径
    */
   mode: 'development',
+  output: {
+    /**
+     * HotModuleReplacement下文件名无法使用hash，
+     * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
+     */
+    filename: '[name].[chunkhash].js', 
+    chunkFilename: '[id].js'
+  },
   // these devServer options should be customized in /config/index.js
   devServer: {
     clientLogLevel: 'warning',
@@ -24,7 +32,7 @@ module.exports = merge(baseWebpackConfig, {
     port: '8080',
     open: true,
     publicPath: '/',
-    quiet: true, // necessary for FriendlyErrorsPlugin
+    // quiet: true, // necessary for FriendlyErrorsPlugin
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -38,8 +46,8 @@ module.exports = merge(baseWebpackConfig, {
      */
     // new webpack.NamedModulesPlugin()
     new HtmlWebpackPlugin({
-      filename: path.join(__dirname, '../dist/index.html'),// 文件写入路径
-      template: path.join(__dirname, '../src/index.html'),// 模板文件路径
+      filename: 'index.html', // 文件写入路径，好像dev-server模式下只能使用此文件名，不能配置路径
+      template: path.resolve(__dirname, '../src/index.html'),// 模板文件路径
       inject: true
     }),
   ]

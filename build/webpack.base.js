@@ -12,9 +12,7 @@ module.exports = {
     app: './src/main.js'
   },
   output: {
-    path: path.resolve(__dirname, '../dist/js'),
-    filename: '[name]-[chunkhash:7].js',
-    chunkFilename: '[id]-[chunkhash:7].js'
+    path: path.resolve(__dirname, '../dist/js')
   },
   module: {
     rules: [
