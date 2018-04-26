@@ -24,8 +24,8 @@ module.exports = merge(webpackBaseConfig, {
      * development下HotModuleReplacement下文件名无法使用hash，
      * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
      */
-    filename: 'js/[name].[chunkhash].js',
-    chunkFilename: 'js/[name].[chunkhash].js'
+    filename: 'static/js/[name].[chunkhash].js',
+    chunkFilename: 'static/js/[name].[chunkhash].js'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -36,7 +36,7 @@ module.exports = merge(webpackBaseConfig, {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: "css/[name]-[contenthash].css"
+      filename: "static/css/[name]-[contenthash].css"
     }),
     /**
      * https://zhuanlan.zhihu.com/p/35093098

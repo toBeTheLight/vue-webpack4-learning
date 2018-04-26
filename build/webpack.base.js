@@ -13,7 +13,7 @@ module.exports = {
   },
   output: {
     // 资源输出绝对路径
-    path: path.resolve(__dirname, '../dist/static/')
+    path: path.resolve(__dirname, '../dist/')
   },
   module: {
     rules: [
@@ -41,7 +41,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 1,
-          name: 'img/[name].[hash:7].[ext]'
+          name: 'static/img/[name].[hash:7].[ext]'
         }
       },
       {
@@ -49,7 +49,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'media/[name].[hash:7].[ext]',
+          name: 'static/media/[name].[hash:7].[ext]',
         }
       },
       {
@@ -57,7 +57,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'fonts/[name].[hash:7].[ext]',
+          name: 'static/fonts/[name].[hash:7].[ext]',
         }
       }
     ]

@@ -10,8 +10,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 module.exports = merge(baseWebpackConfig, {
   /**
    * development模式下默认启用这些插件
-   * NamedChunksPlugin  
-   * NamedModulesPlugin // 显示模块的相对路径
+   * NamedChunksPlugin  // 使用entry名做标识
+   * NamedModulesPlugin // 使用模块的相对路径非自增id做标识
+   * 以上两个模块均为解决hash固化的问题
    */
   mode: 'development',
   output: {
@@ -19,13 +20,13 @@ module.exports = merge(baseWebpackConfig, {
      * HotModuleReplacement下文件名无法使用hash，
      * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
      */
-    filename: '[name].js', 
-    chunkFilename: '[id].js'
+    filename: 'static/[name].js', 
+    chunkFilename: 'static/[id].js'
   },
   devServer: {
     clientLogLevel: 'warning',
     hot: true,
-    contentBase: false, // since we use CopyWebpackPlugin.
+    contentBase: false,
     compress: true,
     host: 'localhost',
     port: '8080',
