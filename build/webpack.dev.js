@@ -19,7 +19,7 @@ module.exports = merge(baseWebpackConfig, {
      * HotModuleReplacement下文件名无法使用hash，
      * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
      */
-    filename: '[name].[chunkhash].js', 
+    filename: '[name].js', 
     chunkFilename: '[id].js'
   },
   // these devServer options should be customized in /config/index.js
