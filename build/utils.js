@@ -36,7 +36,16 @@ exports.cssLoaders = (options) => {
     }
 
     if (options.extract) {
-      return [MiniCssExtractPlugin.loader].concat(loaders)
+      return [{
+        loader: MiniCssExtractPlugin.loader,
+        options: {
+          /*
+          * 复写css文件中资源路径
+          * 3.x配置在extract-text-webpack-plugin插件中
+          */
+          publicPath: '../' 
+        }
+      }].concat(loaders)
     } else {
       return ['vue-style-loader'].concat(loaders)
     }

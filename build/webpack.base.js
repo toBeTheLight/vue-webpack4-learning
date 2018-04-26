@@ -5,14 +5,15 @@ const utils = require('./utils')
 module.exports = {
   /**
    * 1. __dirname 为node全局对象，是当前文件所在目录
-   * 2. context为 entry和部分插件的前置路径
+   * 2. context为 查找entry和部分插件的前置路径
    */
   context: path.resolve(__dirname, '../'),
   entry: {
     app: './src/main.js'
   },
   output: {
-    path: path.resolve(__dirname, '../dist/js')
+    // 资源输出绝对路径
+    path: path.resolve(__dirname, '../dist/static/')
   },
   module: {
     rules: [
@@ -39,7 +40,7 @@ module.exports = {
         test: /\.(png|jpg|jpeg|gif|svg)(\?.*)?$/, // 末尾\?.*匹配带?资源路径，css字体配置中可能带版本信息
         loader: 'url-loader',
         options: {
-          limit: 10000,
+          limit: 1,
           name: 'img/[name].[hash:7].[ext]'
         }
       },

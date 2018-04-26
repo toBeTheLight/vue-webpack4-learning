@@ -24,8 +24,8 @@ module.exports = merge(webpackBaseConfig, {
      * development下HotModuleReplacement下文件名无法使用hash，
      * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
      */
-    filename: '[name].[chunkhash].js',
-    chunkFilename: '[id].[chunkhash].js'
+    filename: 'js/[name].[chunkhash].js',
+    chunkFilename: 'js/[name].[chunkhash].js'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -48,8 +48,7 @@ module.exports = merge(webpackBaseConfig, {
      * 
      * 开发模式有另一个插件NamedModulesPlugin
      */
-    new webpack.HashedModuleIdsPlugin(),
-    new webpack.NamedChunksPlugin()
+    new webpack.HashedModuleIdsPlugin()
   ],
   /**
    * 暂时不知道具体配置信息

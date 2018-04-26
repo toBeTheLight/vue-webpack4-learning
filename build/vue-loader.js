@@ -3,7 +3,8 @@ const utils = require('./utils')
 
 module.exports = {
   loaders: utils.cssLoaders({
-    sourceMap: true
+    sourceMap: true,
+    extract: true
   }),
   cssSourceMap: true,
   transformToRequire: {

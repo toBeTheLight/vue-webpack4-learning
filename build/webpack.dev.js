@@ -22,7 +22,6 @@ module.exports = merge(baseWebpackConfig, {
     filename: '[name].js', 
     chunkFilename: '[id].js'
   },
-  // these devServer options should be customized in /config/index.js
   devServer: {
     clientLogLevel: 'warning',
     hot: true,
@@ -43,8 +42,9 @@ module.exports = merge(baseWebpackConfig, {
     /**
      * 对应production下HashedModuleIdsPlugin插件
      * 使用路径做模块标识
+     * 因为develop模式下默认使用，不再开启
      */
-    // new webpack.NamedModulesPlugin()
+    // new webpack.NamedModulesPlugin(), 
     new HtmlWebpackPlugin({
       filename: 'index.html', // 文件写入路径，好像dev-server模式下只能使用此文件名，不能配置路径
       template: path.resolve(__dirname, '../src/index.html'),// 模板文件路径
