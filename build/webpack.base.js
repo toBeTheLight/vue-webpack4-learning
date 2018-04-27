@@ -9,10 +9,14 @@ module.exports = {
    */
   context: path.resolve(__dirname, '../'),
   entry: {
+    /**
+     * 入口，chunkname: 路径
+     * 多入口可配置多个
+     */
     app: './src/main.js'
   },
   output: {
-    // 资源输出绝对路径
+    // 资源文件输出时写入的路径
     path: path.resolve(__dirname, '../dist/')
   },
   module: {
@@ -25,12 +29,14 @@ module.exports = {
          * 多个：use/loaders: [string|[]单个]
          */
         loader: 'vue-loader',
+        // 包含在.vue文件内的css预处理器配置
         options: vueLoaderConfig
       },
       {
         test: /\.js$/,
         loader: 'babel-loader'
       },
+      // 单独配置的css预处理器配置
       ...utils.styleLoaders({
         sourceMap: true,
         extract: true,

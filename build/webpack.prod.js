@@ -8,8 +8,8 @@ const path = require('path')
 module.exports = merge(webpackBaseConfig, {
   /**
    * production模式下默认启用这些插件
-   * FlagDependencyUsagePlugin, 
-   * FlagIncludedChunksPlugin, 
+   * FlagDependencyUsagePlugin, // 应该是删除无用代码的，其他插件依赖
+   * FlagIncludedChunksPlugin, // 应该是删除无用代码的，其他插件依赖
    * ModuleConcatenationPlugin,  // 作用域提升
    * NoEmitOnErrorsPlugin,  // 遇到错误代码不跳出
    * OccurrenceOrderPlugin, 

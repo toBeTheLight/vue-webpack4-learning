@@ -22,7 +22,7 @@ exports.cssLoaders = (options) => {
       sourceMap: options.sourceMap
     }
   }
-
+  // 生成针对某种css预处理器的loaders配置组
   const generateLoaders = (type, loaderOptions) => {
     const loaders = options.usePostCSS ? [cssLoader, postLoader] : [cssLoader]
     loaderOptions = loaderOptions || {}
@@ -42,11 +42,21 @@ exports.cssLoaders = (options) => {
           /*
           * 复写css文件中资源路径
           * 3.x配置在extract-text-webpack-plugin插件中
+          * 因为css文件中的外链是相对与css的，而我们的css文件在css文件夹内
+          * 引用其他如img/a.png会寻址错误，所以需要配置../
           */
           publicPath: '../' 
         }
       }].concat(loaders)
     } else {
+      /**
+       * 以返回 ['vue-style-loader', 'css-loader', 'postcss-loader', 'less-loader']
+       * @import url(demo.less)为例子
+       * less-loader先处理less语法
+       * postcss-loader进行前缀添加等其他处理
+       * css-loader处理@import将内容引入@import所在的css文件内
+       * vue-style-loader将生成style标签插入head
+       */
       return ['vue-style-loader'].concat(loaders)
     }
   }
