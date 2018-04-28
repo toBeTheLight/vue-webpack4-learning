@@ -1,3 +1,7 @@
+/**
+ * 这块基本上直接拿的webpack模板代码
+ * https://github.com/vuejs-templates/webpack
+ */
 const path = require('path')
 
 const webpack = require('webpack')

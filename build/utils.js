@@ -41,9 +41,11 @@ exports.cssLoaders = (options) => {
         options: {
           /*
           * 复写css文件中资源路径
-          * 3.x配置在extract-text-webpack-plugin插件中
-          * 因为css文件中的外链是相对与css的，而我们的css文件在css文件夹内
-          * 引用其他如img/a.png会寻址错误，所以需要配置../
+          * webpack3.x配置在extract-text-webpack-plugin插件中
+          * 因为css文件中的外链是相对与css的，
+          * 我们抽离的css文件在可能会单独放在css文件夹内
+          * 引用其他如img/a.png会寻址错误
+          * 这种情况下所以单独需要配置../，复写其中资源的路径
           */
           publicPath: '../' 
         }
