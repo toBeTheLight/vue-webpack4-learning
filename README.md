@@ -1,7 +1,7 @@
 从0开始的 vue 开发模板
 
-使用 webpack4 搭建原 vue-cli webpack 模板，熟悉 webpack 与 webpack4 配置。与版本 4 相关的章节会添加符号 ④。  
-本文不做 webpack 配置 api 的介绍，只介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳。配置位于 build 文件夹下。
+使用 webpack4 搭建原 vue-cli2 webpack 模板，熟悉 webpack 与 webpack4 配置。与版本 4 相关的章节会添加符号 ④。  
+本文不做 webpack 配置的完整介绍，只介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳。配置位于 build 文件夹下。
 
 # 基本公用配置
 

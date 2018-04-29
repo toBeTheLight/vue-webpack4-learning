@@ -4,6 +4,7 @@ import router from './router/index'
 
 import 'reset.css'
 
+/* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,

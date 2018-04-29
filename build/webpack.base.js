@@ -22,6 +22,16 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        // 大部分配置抽取到 .eslintrc.js 文件中
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+          emitWarning: true
+        }
+      },
+      {
         test: /\.vue$/,
         /**
          * loader配置的几种写法: https://www.bilibili.com/bangumi/play/ss12432
