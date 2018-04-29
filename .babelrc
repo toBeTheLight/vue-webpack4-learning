@@ -10,6 +10,6 @@
     ]
   ],
   "plugins": [
-    "dynamic-import-node"
+    "syntax-dynamic-import"
   ]
 }
