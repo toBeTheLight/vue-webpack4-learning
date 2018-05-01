@@ -24,8 +24,8 @@ module.exports = merge(webpackBaseConfig, {
      * development下HotModuleReplacement下文件名无法使用hash，
      * 所以将filename与chunkFilename配置从base中拆分到dev与prod中
      */
-    filename: 'static/js/[name].[chunkhash].js',
-    chunkFilename: 'static/js/[name].[chunkhash].js'
+    filename: 'static/js/[name].[chunkhash:7].js',
+    chunkFilename: 'static/js/[name].[chunkhash:7].js'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -36,7 +36,7 @@ module.exports = merge(webpackBaseConfig, {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: "static/css/[name]-[contenthash].css"
+      filename: "static/css/[name].[contenthash:7].css"
     }),
     /**
      * https://zhuanlan.zhihu.com/p/35093098
@@ -51,32 +51,35 @@ module.exports = merge(webpackBaseConfig, {
     new webpack.HashedModuleIdsPlugin()
   ],
   /**
-   * 暂时不知道具体配置信息
+   * 优化部分包括代码拆分
+   * 且运行时（manifest）的代码拆分提取为了独立的 runtimeChunk 配置 
    */
   optimization: {
     splitChunks: {
-      chunks: "async",
-      minSize: 1,
-      minChunks: 1,
-      maxAsyncRequests: 5,
-      maxInitialRequests: 3,
-      name: true,
+      chunks: "all",
       cacheGroups: {
-        commons: {
-          name: "commons",
-          chunks: "async",
-          minChunks: 2
-        },
-        commons: {
+        vendors: {
           test: /[\\/]node_modules[\\/]/,
           name: "vendors",
           chunks: "all"
+        },
+        commons: {
+          // async 设置提取异步代码中的公用代码
+          chunks: "async",
+          name: 'commons-async',
+          /**
+           * minSize 默认为 30000
+           * 想要使代码拆分真的按照我们的设置来
+           * 需要减小 minSize
+           */
+          minSize: 1
         }
       }
     },
     /**
-     * 对应原来的minchunks: Infinity
-     * 运行时代码
+     * 对应原来的 minchunks: Infinity
+     * 提取 webpack 运行时代码
+     * 直接置为 true 或设置 name
      */
     runtimeChunk: {
       name: 'manifest'

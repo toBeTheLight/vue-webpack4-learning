@@ -110,7 +110,8 @@ module.exports = {
 
 ## babel-loader
 
-我们使用 babel 编译浏览器不能识别的 js、类 js 语法，同样将 babel-loader 的配置拆分出去，需要创建 `.babelrc` 并配置：
+我们使用 babel 编译浏览器不能识别的 js、类 js 语法，如转义 ES6+、JSX等。同样将 babel-loader 的配置拆分出去，需要创建 `.babelrc` 并配置：
+
 ```js
 {
   "presets": [
@@ -128,16 +129,56 @@ module.exports = {
     ]
   ],
   "plugins": [
-    "dynamic-import-node" // 异步加载插件
+    "syntax-dynamic-import" // 异步加载语法编译插件
   ]
 }
 ```
 
+## 媒体资源 loader
+
+我们还需要对图片、视频、字体等文件进行 loader 配置，以字体文件为例子，主要用到的是 url-loader：
+```js
+{
+  /**
+   * 末尾\?.*匹配带?资源路径
+   * 我们引入的第三方css字体样式对字体的引用路径中可能带查询字符串的版本信息
+   */
+  test: /\.(woff2|woff|eot|ttf|otf)(\?.*)?$/,
+  /**
+   * url-loader
+   * 会配合 webpack 对资源引入路径进行复写，如将 css 提取成独立文件，可能出现 404 错误可查看 提取 js 中的 css 部分解决
+   * 会以 webpack 的输出路径为基本路径，以 name 配置进行具体输出
+   * limit 单位为 byte，小于这个大小的文件会编译为 base64 写进 js 或 html
+   */
+  loader: 'url-loader',
+  options: {
+    limit: 10000,
+    name: 'static/fonts/[name].[hash:7].[ext]',
+  }
+}
+```
+## 静态文件拷贝
+
+直接引用（绝对路径）和代码执行时确定的资源路径应该是以静态文件存在的，所以我们将它们放在独立的文件夹（如 static）中，并在代码打包后拷贝到我们的输出目录。
+
+```js
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+// 在开发模式下，会将文件写入内存
+new CopyWebpackPlugin([
+  {
+    from: path.resolve(__dirname, '../static'),
+    to: 'static',
+    ignore: ['.*']
+  }
+])
+```
+
 # 生产模式 production
 
-由于生产模式的配置相当来说比较简单，我们先进行生产模式的配置。
+相对于开发模式来讲，生产模式的配置比较简单，我们先进行生产模式的配置。
 
-## 添加script脚本命令
+## 添加 script 脚本命令
 
 在 package.json 下添加
 
@@ -190,9 +231,10 @@ module.exports = merge(webpackBaseConfig, {
   * OccurrenceOrderPlugin
   * SideEffectsFlagPlugin
   * UglifyJsPlugin：js代码压缩
-* process.env.NODE_ENV 的值设为 production：node环境变量
+* process.env.NODE_ENV 的值设为 production
 
 所以这些默认启用的内容我们不需要再配置。
+最后一点很重要 `process.env.NODE_ENV 的值设为 production`。
 
 ## 添加 webpack 打出的 bundles 到 HTML 文件
 
@@ -215,7 +257,7 @@ plugins: [
 
 ## ④ 提取 js 中的 css 部分到单独的文件
 
-使用过 webpack3 的同学应该对 `extract-text-webpack-plugin` 插件（以旧插件代称）比较熟悉，为了产生webpack4，我并不想使用这个插件的 `@next` 版本，所以选择了新的`mini-css-extract-plugin`（以新插件代称）。  
+使用过 webpack3 的同学应该对 `extract-text-webpack-plugin` 插件（以旧插件代称）比较熟悉，为了尝试webpack4，我并不想使用这个插件的 `@next` 版本，所以选择了新的`mini-css-extract-plugin`（以新插件代称）。  
 与旧插件相同，同样需要在 webpack 的 loader 部分和 plugin 部分都进行配置，不同的是新插件提供了单独的 loader，与旧插件的配置方式不太相同。配置如下：
 
 * loader 部分
@@ -266,9 +308,145 @@ if (options.extract) {
 
 ## ④ js 公共文件提取
 
-这是 webpack 配置中很重要的一个环节，影响到我们使用浏览器缓存的合理性，影响页面资源的加载速度。使用过 webpack3 的同学一定清楚，我们一般会提取出这么几个文件 `manifest.js`（webpack 运行时等）、`vendor.js`（node_modules内的库）、app.js（真正的项目业务代码）。
+这是 webpack 配置中很重要的一个环节，影响到我们使用浏览器缓存的合理性，影响页面资源的加载速度，将 chunk 进行合理拆分，可以有效减小我们每次更新代码影响到的文件范围。  
+使用过 webpack3 的同学一定清楚，我们一般会提取出这么几个文件 `manifest.js`（webpack 运行时，即webpack解析其他bundle的代码等）、`vendor.js`（node_modules内的库）、app.js（真正的项目业务代码）。在 webpack3 中我们使用 `webpack.optimize.CommonsChunkPlugin`插件进行提取，webpack4 中我们可以直接使用 `optimization` 配置项进行配置（当然仍可使用插件配置）：
+```js
+/**
+ * 优化部分包括代码拆分
+ * 且运行时（manifest）的代码拆分提取为了独立的 runtimeChunk 配置 
+ */
+optimization: {
+  splitChunks: {
+    chunks: "all",
+    cacheGroups: {
+      // 提取 node_modules 中代码
+      vendors: {
+        test: /[\\/]node_modules[\\/]/,
+        name: "vendors",
+        chunks: "all"
+      },
+      commons: {
+        // async 设置提取异步代码中的公用代码
+        chunks: "async"
+        name: 'commons-async',
+        /**
+         * minSize 默认为 30000
+         * 想要使代码拆分真的按照我们的设置来
+         * 需要减小 minSize
+         */
+        minSize: 1,
+      }
+    }
+  },
+  /**
+   * 对应原来的 minchunks: Infinity
+   * 提取 webpack 运行时代码
+   * 直接置为 true 或设置 name
+   */
+  runtimeChunk: {
+    name: 'manifest'
+  }
+}
+```
 
-## 环境区分问题
+# 开发模式 development
+
+开发模式与生产模式的不同是，在开发时会频繁运行代码，所以很多东西在开发模式是不推荐配置的，如css文件提取，代码压缩等。所以针对一些写入公共配置文件，但是开发模式不需要的功能，我们需要做类似修改：`process.env.NODE_ENV === 'production' ? true : false`，如 css 预处理中是否需要配置提取 loader `MiniCssExtractPlugin.loader`。此外还有一些是只配置在生产模式下的，如 `MiniCssExtractPlugin` 和 js 代码拆分优化。
+
+开发模式我们需要一个[开发服务](https://webpack.js.org/configuration/dev-server/#devserver)，帮我们完成实时更新、接口代理等功能。我们使用 `webpack-dev-server`。需要 npm 安装。
+
+## 添加 script 脚本命令
+
+同样，在 package.json 下添加
+
+```
+"scripts": {
+  "dev": "webpack-dev-server --config ./build/webpack.dev.js"
+}
+```
+使用 `--config` 指定配置文件，由于命令直接调用 webpack-dev-server 运行，所以我们直接写配置就好，可以不像生产模式一样去编写调用逻辑。
+
+## 开发模式配置文件
+
+新建 `webpack.dev.js` 文件，同样使用：
+```js
+const merge = require('webpack-merge') // 专用合并webpack配置的包
+const webpackBaseConfig = require('./webpack.base')
+module.exports = merge(webpackBaseConfig, {
+  // 开发模式配置
+})
+```
+## ④ mode 预设
+
+同样，在开发模式下我们可以将 `mode` 配置为 `development`，同样默认启用了：
+* 插件
+  * NamedChunksPlugin：使用 entry 名做 chunk 标识
+  * NamedModulesPlugin：使用模块的相对路径非自增 id 做模块标识
+* process.env.NODE_ENV 的值设为 development
+
+## 开发服务配置 devServer
+
+```js
+devServer: {
+  clientLogLevel: 'warning',
+  inline: true,
+  // 启动热更新
+  hot: true,
+  // 在页面上全屏输出报错信息
+  overlay: {
+    warnings: true,
+    errors: true
+  },
+  // 显示 webpack 构建进度
+  progress: true,
+  // dev-server 服务路径
+  contentBase: false,
+  compress: true,
+  host: 'localhost',
+  port: '8080',
+  // 自动打开浏览器
+  open: true,
+  // 可以进行接口代理配置
+  proxy： xxx,
+  // 跟 friendly-errors-webpack-plugin 插件配合
+  quiet: true,
+  publicPath: '/'
+}
+```
+
+## 其他插件
+
+使用热更新时需要使用配置
+```js
+plugins: [
+  new webpack.HotModuleReplacementPlugin()
+]
+```
+优化 webpack 输出信息，需要配置
+```js
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+plugins: [
+  new FriendlyErrorsPlugin()
+]
+```
+
+## 注意事项
+
+* 热更新：在使用热更新时，我们的 chunk 名中不能使用 `[hash]` 做标识，所以需要将原来配置在公共配置中的 output 中的文件名配置分别写入生产和开发模式配置中，开发模式去掉 `[hash]`
+  ```
+  filename: 'static/[name].js', 
+  chunkFilename: 'static/[id].js'
+  ```
+* HtmlWebpackPlugin：在生产模式下，我们将 html 文件写入到 dist 下，但是在开发模式下，并没有实际的写入过程，且 `devServer` 启动后的服务内容与 `contentBase` 有关，两者需要一致，所以我们将 `HtmlWebpackPlugin` 的配置也分为 生产和开发模式，开发模式下使用：
+  ```
+  new HtmlWebpackPlugin({
+    filename: 'index.html', // 文件写入路径，前面的路径与 devServer 中 contentBase 对应
+    template: path.resolve(__dirname, '../src/index.html'),// 模板文件路径
+    inject: true
+  })
+  ```
+
+ ## 环境区分问题
 
 我们默认配置目的为上述目的，在这个前提下，简述下配置中可能存在的问题。
 

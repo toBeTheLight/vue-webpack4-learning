@@ -1,5 +1,6 @@
 const path = require('path')
 const vueLoaderConfig = require('./vue-loader')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const utils = require('./utils')
 
 module.exports = {
@@ -19,6 +20,16 @@ module.exports = {
     // 资源文件输出时写入的路径
     path: path.resolve(__dirname, '../dist/')
   },
+  plugins: [
+    // 开发模式下，会将文件写入内存
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../static'),
+        to: 'static',
+        ignore: ['.*']
+      }
+    ])
+  ],
   module: {
     rules: [
       {
@@ -49,14 +60,21 @@ module.exports = {
       // 单独配置的css预处理器配置
       ...utils.styleLoaders({
         sourceMap: true,
-        extract: true,
+        extract: process.env.NODE_ENV === 'production' ? true : false,
         usePostCSS: true
       }),
       {
-        test: /\.(png|jpg|jpeg|gif|svg)(\?.*)?$/, // 末尾\?.*匹配带?资源路径，css字体配置中可能带版本信息
+        // 末尾\?.*匹配带?资源路径，css字体配置中可能带版本信息
+        test: /\.(png|jpg|jpeg|gif|svg)(\?.*)?$/,
+        /**
+         * url-loader
+         * 会配合 webpack 对资源引入路径进行复写，如将 css 提取成独立文件，可能出现 404 错误可查看 提取 js 中的 css 部分解决
+         * 会以 webpack 的输出路径为基本路径，以 name 配置进行具体输出
+         * limit 单位为 byte，小于这个大小的文件会编译为 base64 写进 js 或 html
+         */
         loader: 'url-loader',
         options: {
-          limit: 1,
+          limit: 10000,
           name: 'static/img/[name].[hash:7].[ext]'
         }
       },

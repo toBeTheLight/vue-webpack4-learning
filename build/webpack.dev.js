@@ -6,6 +6,7 @@ const baseWebpackConfig = require('./webpack.base')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
 module.exports = merge(baseWebpackConfig, {
   /**
@@ -25,21 +26,28 @@ module.exports = merge(baseWebpackConfig, {
   },
   devServer: {
     clientLogLevel: 'warning',
+    inline: true,
+    // 启动热更新
     hot: true,
+    // 在页面上全屏输出报错信息
+    overlay: {
+      warnings: true,
+      errors: true
+    },
+    // 显示进度
+    progress: true,
+    // dev-server 服务路径
     contentBase: false,
     compress: true,
     host: 'localhost',
     port: '8080',
     open: true,
-    publicPath: '/',
-    // quiet: true, // necessary for FriendlyErrorsPlugin
+    quiet: true,
+    publicPath: '/'
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: "[name]-[contenthash].css",
-      chunkFilename: "[id]-[contenthash].css"
-    }),
     new webpack.HotModuleReplacementPlugin(),
+    new FriendlyErrorsPlugin(),
     /**
      * 对应production下HashedModuleIdsPlugin插件
      * 使用路径做模块标识
@@ -47,7 +55,7 @@ module.exports = merge(baseWebpackConfig, {
      */
     // new webpack.NamedModulesPlugin(), 
     new HtmlWebpackPlugin({
-      filename: 'index.html', // 文件写入路径，好像dev-server模式下只能使用此文件名，不能配置路径
+      filename: 'index.html', // 文件写入路径，前面的路径与 devServer 中 contentBase 对应
       template: path.resolve(__dirname, '../src/index.html'),// 模板文件路径
       inject: true
     }),

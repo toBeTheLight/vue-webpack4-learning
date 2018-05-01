@@ -4,7 +4,7 @@ const utils = require('./utils')
 module.exports = {
   loaders: utils.cssLoaders({
     sourceMap: true,
-    extract: true
+    extract: process.env.NODE_ENV === 'production' ? true : false
   }),
   cssSourceMap: true,
   transformToRequire: {
