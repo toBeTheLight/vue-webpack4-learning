@@ -1,4 +1,6 @@
 'use strict'
+process.env.NODE_ENV = 'development'
+
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const path = require('path')
@@ -7,6 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+
 
 module.exports = merge(baseWebpackConfig, {
   /**

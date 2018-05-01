@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'production'
 /**
  * 这块基本上直接拿的webpack模板代码
  * https://github.com/vuejs-templates/webpack

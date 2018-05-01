@@ -1,7 +1,10 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const webpackBaseConfig = require('./webpack.base')
+const BundleAnalyzer = require('webpack-bundle-analyzer')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+// const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const merge = require('webpack-merge')
 const path = require('path')
 
@@ -48,7 +51,21 @@ module.exports = merge(webpackBaseConfig, {
      * 
      * 开发模式有另一个插件NamedModulesPlugin
      */
-    new webpack.HashedModuleIdsPlugin()
+    new webpack.HashedModuleIdsPlugin(),
+    new OptimizeCSSAssetsPlugin({}), // css 压缩
+    new BundleAnalyzer.BundleAnalyzerPlugin(), // bundle 分析
+    // gzip 压缩一般由服务器直接提供
+    // new CompressionWebpackPlugin({
+    //   asset: '[path].gz[query]',
+    //   algorithm: 'gzip',
+    //   test: new RegExp(
+    //     '\\.(' +
+    //     config.build.productionGzipExtensions.join('|') +
+    //     ')$'
+    //   ),
+    //   threshold: 10240,
+    //   minRatio: 0.8
+    // })
   ],
   /**
    * 优化部分包括代码拆分
@@ -72,7 +89,9 @@ module.exports = merge(webpackBaseConfig, {
            * 想要使代码拆分真的按照我们的设置来
            * 需要减小 minSize
            */
-          minSize: 1
+          minSize: 0,
+          // 至少为两个 chunks 的公用代码
+          minChunks: 2
         }
       }
     },

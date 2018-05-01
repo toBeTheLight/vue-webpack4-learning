@@ -1,7 +1,12 @@
-从0开始的 vue 开发模板
+# 前言
 
-使用 webpack4 搭建原 vue-cli2 webpack 模板，熟悉 webpack 与 webpack4 配置。与版本 4 相关的章节会添加符号 ④。  
-本文不做 webpack 配置的完整介绍，只介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳。配置位于 build 文件夹下。
+熟悉 webpack 与 webpack4 配置。webpack4 相对于 3 的最主要的区别是所谓的`零配置`，但是为了满足我们的项目需求还是要自己进行配置。不过我们可以使用一些 webpack 的预设值。同时 webpack 也拆成了两部分，webpack 和 webpack-cli，都需要本地安装。 
+
+我们通过实现一个 vue 的开发模板（vue init webpack 模板，其实跟 vue 没多大关系）来进行一次体验。
+
+本文**不做** webpack 配置的**完整介绍**，着重介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳，完整配置与详细注释也可见代码。配置位于 build 文件夹下。
+
+与版本 4 相关的章节会添加符号 ④。  
 
 # 基本公用配置
 
@@ -176,7 +181,7 @@ new CopyWebpackPlugin([
 
 # 生产模式 production
 
-相对于开发模式来讲，生产模式的配置比较简单，我们先进行生产模式的配置。
+我们先进行生产模式的配置。
 
 ## 添加 script 脚本命令
 
@@ -194,6 +199,9 @@ new CopyWebpackPlugin([
 主要是两个工作，引入 `rimraf` 模块删除 webpack 下之前产生的指定文件，启动 webpack，并在不同阶段给出不同的提示信息。
 
 ```js
+// 在第一行设置当前为 生产环境
+process.env.NODE_ENV = 'production'
+
 const webpack = require('webpack')
 const rm = require('rimraf')
 const webpackConfig = require('./webpack.prod')
@@ -231,10 +239,17 @@ module.exports = merge(webpackBaseConfig, {
   * OccurrenceOrderPlugin
   * SideEffectsFlagPlugin
   * UglifyJsPlugin：js代码压缩
-* process.env.NODE_ENV 的值设为 production
+  * process.env.NODE_ENV 的值设为 production
 
 所以这些默认启用的内容我们不需要再配置。
-最后一点很重要 `process.env.NODE_ENV 的值设为 production`。
+
+最后一点设置 `process.env.NODE_ENV 的值设为 production` 其实是使用 DefinePlugin 插件：
+```js
+new webpack.DefinePlugin({
+  "process.env.NODE_ENV": JSON.stringify("production") 
+})
+```
+从而我们可以在业务代码中通过 `process.env.NODE_ENV`，如进行判断，使用开发接口还是线上接口。如果我们需要在 webpack 的配置中判断当前环境，还需要单独的设置 `process.env.NODE_ENV = 'production'`，这也是我们在 `build.js` 中第一行做的事情。
 
 ## 添加 webpack 打出的 bundles 到 HTML 文件
 
@@ -306,9 +321,9 @@ if (options.extract) {
 }
 ```
 
-## ④ js 公共文件提取
+## ④ 拆分 js 代码
 
-这是 webpack 配置中很重要的一个环节，影响到我们使用浏览器缓存的合理性，影响页面资源的加载速度，将 chunk 进行合理拆分，可以有效减小我们每次更新代码影响到的文件范围。  
+这是 webpack 配置中很重要的一个环节，影响到我们使用浏览器缓存的合理性，影响页面资源的加载速度，将 js 进行合理拆分，可以有效减小我们每次更新代码影响到的文件范围。  
 使用过 webpack3 的同学一定清楚，我们一般会提取出这么几个文件 `manifest.js`（webpack 运行时，即webpack解析其他bundle的代码等）、`vendor.js`（node_modules内的库）、app.js（真正的项目业务代码）。在 webpack3 中我们使用 `webpack.optimize.CommonsChunkPlugin`插件进行提取，webpack4 中我们可以直接使用 `optimization` 配置项进行配置（当然仍可使用插件配置）：
 ```js
 /**
@@ -334,7 +349,9 @@ optimization: {
          * 想要使代码拆分真的按照我们的设置来
          * 需要减小 minSize
          */
-        minSize: 1,
+        minSize: 0,
+        // 至少为两个 chunks 的公用代码
+        minChunks: 2
       }
     }
   },
@@ -370,6 +387,8 @@ optimization: {
 
 新建 `webpack.dev.js` 文件，同样使用：
 ```js
+// 在第一行设置当前环境为开发环境
+process.env.NODE_ENV = 'development'
 const merge = require('webpack-merge') // 专用合并webpack配置的包
 const webpackBaseConfig = require('./webpack.base')
 module.exports = merge(webpackBaseConfig, {
@@ -446,14 +465,18 @@ plugins: [
   })
   ```
 
- ## 环境区分问题
+# 优化
 
-我们默认配置目的为上述目的，在这个前提下，简述下配置中可能存在的问题。
+## 拆分 js 代码
 
-1. hot热更新模式不支持文件名使用hash，所以output下的filename和chunkFilename需要区分开发和生产模式。
-2. dev-server下，开发服务启动后需要静态页，我们需要`html-webpack-plugin`插件配合，`HtmlWebpackPlugin`配置的filename需和devServer的contentBase的路径匹配才能在浏览器打开服务地址后读取到html文件，所以HtmlWebpackPlugin配置在开发和生产模式尽量分开。
-3. 开发模式要保证每次修改后编译的速度够快，所以部分插件在开发模式下不需要使用，如css提取，代码压缩，所以相关插件只在生产模式下配置。
+在生产模式的 `拆分 js 代码` 部分我们已经讲了如何拆分，那么为了更好的分析我们的拆分是否合理，我们可以配置一个 bundle 组成分析的插件。
+```js
+const BundleAnalyzer = require('webpack-bundle-analyzer')
+plugins: [
+  new BundleAnalyzer.BundleAnalyzerPlugin()
+]
+```
 
-## 变动
+## hash 固化
 
-## 缓存固化
+我们使用文件名中的 hash 变化来进行资源文件的更新，那么合理利用缓存时，就要求我们合理的拆分文件，在内容更新时最小限度的影响文件名中的 hash。这里就用到了`[hash]`，`[chunkhash]`，`[contenthash]`。然而 webpack 对 hash 的默认处理并不尽如人意，这一部分的优化可以参考[基于 webpack 的持久化缓存方案](https://github.com/pigcan/blog/issues/9)
