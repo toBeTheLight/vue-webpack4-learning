@@ -58,9 +58,16 @@ module.exports = merge(baseWebpackConfig, {
      */
     // new webpack.NamedModulesPlugin(), 
     new HtmlWebpackPlugin({
-      filename: 'index.html', // 文件写入路径，前面的路径与 devServer 中 contentBase 对应
+      filename: 'entry.html', // 文件写入路径，前面的路径与 devServer 中 contentBase 对应
       template: path.resolve(__dirname, '../src/index.html'),// 模板文件路径
-      inject: true
+      inject: true,
+      chunks: ['manifest', 'vendors', 'entry']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'main.html', // 文件写入路径，前面的路径与 devServer 中 contentBase 对应
+      template: path.resolve(__dirname, '../src/index.html'),// 模板文件路径
+      inject: true,
+      chunks: ['manifest', 'vendors', 'main']
     }),
   ]
 })

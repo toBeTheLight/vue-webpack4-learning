@@ -6,7 +6,9 @@
 
 本文**不做** webpack 配置的**完整介绍**，着重介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳，完整配置与详细注释也可见代码。配置位于 build 文件夹下。
 
-与版本 4 相关的章节会添加符号 ④。  
+**与版本 4 相关的章节会添加符号 ④**。
+
+需要注意的一点是，我们的 webpack 代码是运行在node环境下的，这部分代码可以使用 node api，但是我们的业务代码（src下）是无法使用 node api 的。
 
 # 基本公用配置
 
@@ -164,7 +166,7 @@ module.exports = {
 ```
 ## 静态文件拷贝
 
-直接引用（绝对路径）和代码执行时确定的资源路径应该是以静态文件存在的，所以我们将它们放在独立的文件夹（如 static）中，并在代码打包后拷贝到我们的输出目录。
+直接引用（绝对路径）和代码执行时确定的资源路径应该是以静态文件存在的，这些资源文件不会经过 webpack 编译处理，所以我们将它们放在独立的文件夹（如 static）中，并在代码打包后拷贝到我们的输出目录。
 
 ```js
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -480,3 +482,58 @@ plugins: [
 ## hash 固化
 
 我们使用文件名中的 hash 变化来进行资源文件的更新，那么合理利用缓存时，就要求我们合理的拆分文件，在内容更新时最小限度的影响文件名中的 hash。这里就用到了`[hash]`，`[chunkhash]`，`[contenthash]`。然而 webpack 对 hash 的默认处理并不尽如人意，这一部分的优化可以参考[基于 webpack 的持久化缓存方案](https://github.com/pigcan/blog/issues/9)
+
+# 多页面
+
+多页面配置代码位于muilt-pages分支。我们只需做少量修改，以目前有 entry 页和 index 页为例。
+
+## entry 改动
+
+将两个页面的 js 入口都配置在 `webpack` 的 `entry`中：
+```js
+entry: {
+  /**
+    * 入口，chunkname: 路径
+    * 多入口可配置多个
+    */
+  main: './src/main.js',
+  entry: './src/entry.js'
+}
+```
+也可以自己设置项目结构，使用 node api 动态读取的方式获取目前的多页面入口。
+
+## HtmlWebpackPlugin 改动
+
+需按照页面个数配置多个 `HtmlWebpackPlugin`：
+```js
+new HtmlWebpackPlugin({
+  filename: path.join(__dirname, '../dist/main.html'),// 文件写入路径
+  template: path.join(__dirname, '../src/index.html'),// 模板文件路径
+  inject: true, // 插入位置
+  chunks: ['manifest', 'vendors', 'common', 'main']
+}),
+new HtmlWebpackPlugin({
+  filename: path.join(__dirname, '../dist/entry.html'),// 文件写入路径
+  template: path.join(__dirname, '../src/index.html'),// 模板文件路径
+  inject: true, // 插入位置
+  chunks: ['manifest', 'vendors', 'common', 'entry']
+}),
+```
+
+其中需手动指定每个页面的插入的 chunks（同步的），否则会将其他页面的文件也一同插入当前页面。
+
+## ④ 公共js提取
+
+在单页面下，一般不存在提取非异步 js 文件的公共代码（非 node_modules）的问题，在多页面下我们的页面间可能会公用 api、配置等文件，此时可以增加：
+
+```js
+'common': {
+  // initial 设置提取同步代码中的公用代码
+  chunks: 'initial',
+  // test: 'xxxx', 也可使用 test 选择提取哪些 chunks 里的代码
+  name: 'common',
+  minSize: 0,
+  minChunks: 2
+}
+```
+提取同步代码中的公用代码

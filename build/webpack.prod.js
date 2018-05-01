@@ -32,9 +32,16 @@ module.exports = merge(webpackBaseConfig, {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: path.join(__dirname, '../dist/index.html'),// 文件写入路径
+      filename: path.join(__dirname, '../dist/main.html'),// 文件写入路径
       template: path.join(__dirname, '../src/index.html'),// 模板文件路径
-      inject: true // 插入位置
+      inject: true, // 插入位置
+      chunks: ['manifest', 'vendors', 'main'] // 指定当前页面引入的chunks
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, '../dist/entry.html'),// 文件写入路径
+      template: path.join(__dirname, '../src/index.html'),// 模板文件路径
+      inject: true, // 插入位置
+      chunks: ['manifest', 'vendors', 'entry'] // 指定当前页面引入的chunks
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
@@ -73,17 +80,24 @@ module.exports = merge(webpackBaseConfig, {
    */
   optimization: {
     splitChunks: {
-      chunks: "all",
+      chunks: 'all',
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
-          name: "vendors",
-          chunks: "all"
+          name: 'vendors',
+          chunks: 'all'
         },
-        commons: {
+        'common': {
+          // initial 设置提取同步代码中的公用代码
+          chunks: 'initial',
+          name: 'common',
+          minSize: 0,
+          minChunks: 2
+        },
+        'async-common': {
           // async 设置提取异步代码中的公用代码
-          chunks: "async",
-          name: 'commons-async',
+          chunks: 'async',
+          name: 'async-common',
           /**
            * minSize 默认为 30000
            * 想要使代码拆分真的按照我们的设置来

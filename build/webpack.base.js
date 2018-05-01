@@ -14,7 +14,8 @@ module.exports = {
      * 入口，chunkname: 路径
      * 多入口可配置多个
      */
-    app: './src/main.js'
+    main: './src/main.js',
+    entry: './src/entry.js'
   },
   output: {
     // 资源文件输出时写入的路径
