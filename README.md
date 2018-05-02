@@ -2,11 +2,11 @@
 
 [源代码](https://github.com/toBeTheLight/vue-webpack4/tree/master)
 
-熟悉 webpack 与 webpack4 配置。webpack4 相对于 3 的最主要的区别是所谓的`零配置`，但是为了满足我们的项目需求还是要自己进行配置。不过我们可以使用一些 webpack 的预设值。同时 webpack 也拆成了两部分，webpack 和 webpack-cli，都需要本地安装。 
+熟悉 webpack 与 webpack4 配置。webpack4 相对于 3 的最主要的区别是所谓的`零配置`，但是为了满足我们的项目需求还是要自己进行配置，不过我们可以使用一些 webpack 的预设值。同时 webpack 也拆成了两部分，webpack 和 webpack-cli，都需要本地安装。 
 
-我们通过实现一个 vue 的开发模板（vue init webpack 模板，其实跟 vue 没多大关系）来进行一次体验。
+我们通过实现一个 vue 的开发模板（vue init webpack 模板，其实跟 vue 关系不太大）来进行一次体验。
 
-本文**不做** webpack 配置的**完整介绍**，着重介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳，完整配置与详细注释也可见代码。配置位于 build 文件夹下。
+本文**不做** webpack 配置的**完整介绍**，着重介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳，完整配置与详细注释可见源代码。配置位于 build 文件夹下。
 
 **与版本 4 相关的章节会添加符号 ④**。
 
@@ -77,7 +77,7 @@ loader 优先级需要注意两点，
 但是由于 vue 中的单文件组件，又分为两种情况：
 
 * .vue 文件内的 style：  
-  `vue-loader`会对 .vue 单文件组件进行处理，对 .vue 单文件组件内的 lang="type"，各种 type 的语言我们可以在 `vue-loader` 的 options [配置不同的 loader](https://vue-loader-v14.vuejs.org/zh-cn/options.html#loaders)，由于 `vue-loader` 内置了 `postcss` 对 css 进行处理，所以此处我们不需要再配置 `postcss-loader`
+  `vue-loader` 会对 .vue 单文件组件进行处理，对 .vue 单文件组件内的各种 lang="type" 我们可以在 `vue-loader` 的 options [配置不同的 loader](https://vue-loader-v14.vuejs.org/zh-cn/options.html#loaders)，由于 `vue-loader` 内置了 `postcss` 对 css 进行处理，所以此处我们不需要再配置 `postcss-loader`
   ```
   {
     test: /\.vue$/,
@@ -90,10 +90,15 @@ loader 优先级需要注意两点，
     }
   }
   ```
+  
 * js 直接引入中引入样式文件：  
   如 main.js 中 `import 'demo.less'`，这种方式引入的样式文件，在 `vue-loader` 处理范围置之外，所以仍然需要配置 `postcss-loader`。
 
-由于这种差异我们将 对css预处理器文件的配置封装为函数，由 `usePostCss` 参数生成对应配置，将文件放入 `utils.js` 文件内，将 `vue-loader` 配置放在 `vue-loader.js` 文件内。
+由于这种差异我们将 对 css 预处理器文件的配置封装为函数，由 `usePostCss` 参数生成对应配置，将文件放入 `utils.js` 文件内，将 `vue-loader` 配置放在 `vue-loader.js` 文件内。
+
+也就是对 css 预处理器的配置我们需要在 `vue-loader` 内和 `webpack` 内配置两遍。
+
+*写这篇 README.md 期间 vue-loader 发布了 v15 版，需要配合插件使用，不用再进行两遍配置*
 
 ## postcss-loader
 
