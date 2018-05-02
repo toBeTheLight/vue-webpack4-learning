@@ -2,9 +2,11 @@
 
 [源代码](https://github.com/toBeTheLight/vue-webpack4/tree/master)
 
-熟悉 webpack 与 webpack4 配置。webpack4 相对于 3 的最主要的区别是所谓的`零配置`，但是为了满足我们的项目需求还是要自己进行配置，不过我们可以使用一些 webpack 的预设值。同时 webpack 也拆成了两部分，webpack 和 webpack-cli，都需要本地安装。 
+熟悉 webpack 与 webpack4 配置。
 
-我们通过实现一个 vue 的开发模板（vue init webpack 模板，其实跟 vue 关系不太大）来进行一次体验。
+webpack4 相对于 3 的最主要的区别是所谓的`零配置`，但是为了满足我们的项目需求还是要自己进行配置，不过我们可以使用一些 webpack 的预设值。同时 webpack 也拆成了两部分，webpack 和 webpack-cli，都需要本地安装。 
+
+我们通过实现一个 vue 的开发模板（vue init webpack 模板，其实跟 vue 关系不太大）来进行一次体验。在配置过程中会尽量使用 webpack4 的相关内容。
 
 本文**不做** webpack 配置的**完整介绍**，着重介绍配置过程中需要注意的地方。查看代码注释阅读效果更佳，完整配置与详细注释可见源代码。配置位于 build 文件夹下。
 
@@ -33,7 +35,7 @@ hash 是用在文件输出的名字中的，如 `[name].[hash].js`，总的来�
 2. `[chunkhash]`：每一个 chunk 都根据自身的内容计算而来。
 3. `[contenthash]`：由 css 提取插件提供，根据自身内容计算得来。
 
-可参考[基于 webpack 的持久化缓存方案](https://github.com/pigcan/blog/issues/9)，三种 hash 的使用，我们在优化部分再讲，先优先使用 `[chunkhash]`。
+三种 hash 的使用，我们在优化部分再讲，先优先使用 `[chunkhash]`。
 
 ## loader 优先级
 
@@ -106,9 +108,9 @@ loader 优先级需要注意两点，
 ```js
 module.exports = {
   plugins: {
-    // 处理@import
+    // 处理 @import
     'postcss-import': {},
-    // 处理css中url
+    // 处理 css 中 url
     'postcss-url': {},
     // 自动前缀
     'autoprefixer': {
@@ -135,7 +137,7 @@ module.exports = {
        *  可以根据配置的目标运行环境自动启用需要的 babel 插件。
        */
       "env", {
-        "modules": false, // 关闭babel对es module的处理
+        "modules": false, // 关闭 babel 对 es module 的处理
         "targets": { // 目标运行环境
           "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
         }
@@ -154,8 +156,8 @@ module.exports = {
 ```js
 {
   /**
-   * 末尾\?.*匹配带?资源路径
-   * 我们引入的第三方css字体样式对字体的引用路径中可能带查询字符串的版本信息
+   * 末尾 \?.* 匹配带 ? 资源路径
+   * 我们引入的第三方 css 字体样式对字体的引用路径中可能带查询字符串的版本信息
    */
   test: /\.(woff2|woff|eot|ttf|otf)(\?.*)?$/,
   /**
@@ -215,9 +217,9 @@ process.env.NODE_ENV = 'production'
 const webpack = require('webpack')
 const rm = require('rimraf')
 const webpackConfig = require('./webpack.prod')
-// 删除webpack输出目录下的内容，也可只删除子文件如static等
+// 删除 webpack 输出目录下的内容，也可只删除子文件如 static 等
 rm(webpackConfig.output.path, err => {
-  // webpack按照生产模式配置启动
+  // webpack 按照生产模式配置启动
   webpack(webpackConfig, (err, stats) => {
     // 输出一些状态信息
   })
@@ -230,7 +232,7 @@ rm(webpackConfig.output.path, err => {
 新建 `webpack.prod.js` 文件，使用
 
 ```js
-const merge = require('webpack-merge') // 专用合并webpack配置的包
+const merge = require('webpack-merge') // 专用合并 webpack 配置的包
 const webpackBaseConfig = require('./webpack.base')
 module.exports = merge(webpackBaseConfig, {
   // 生产模式配置
@@ -254,11 +256,13 @@ module.exports = merge(webpackBaseConfig, {
 所以这些默认启用的内容我们不需要再配置。
 
 最后一点设置 `process.env.NODE_ENV 的值设为 production` 其实是使用 DefinePlugin 插件：
+
 ```js
 new webpack.DefinePlugin({
   "process.env.NODE_ENV": JSON.stringify("production") 
 })
 ```
+
 从而我们可以在业务代码中通过 `process.env.NODE_ENV`，如进行判断，使用开发接口还是线上接口。如果我们需要在 webpack 中判断当前环境，还需要单独的设置 `process.env.NODE_ENV = 'production'`，这也是我们在 `build.js` 中第一行做的事情。
 
 ## 添加 webpack 打出的 bundles 到 HTML 文件
@@ -274,7 +278,7 @@ plugins: [
   new HtmlWebpackPlugin({
     filename: path.join(__dirname, '../dist/index.html'),// 文件写入路径
     template: path.join(__dirname, '../src/index.html'),// 模板文件路径
-    inject: true // js等bundles插入html的位置 head/body等
+    inject: true // js 等 bundles 插入 html 的位置 head/body等
   })
 ]
 ```
@@ -286,40 +290,43 @@ plugins: [
 与旧插件相同，同样需要在 webpack 的 loader 部分和 plugin 部分都进行配置，不同的是新插件提供了单独的 loader，在 loader 部分与旧插件的配置方式不太相同。配置如下：
 
 * loader 部分
-  ```js
-  const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-  // ...
-  [
-    {
-      loader: MiniCssExtractPlugin.loader,
-      options: {
-      /*
-      * 复写css文件中资源路径
-      * webpack3.x配置在extract-text-webpack-plugin插件中
-      * 因为css文件中的外链是相对与css的，
-      * 我们抽离的css文件在可能会单独放在css文件夹内
-      * 引用其他如img/a.png会寻址错误
-      * 这种情况下所以单独需要配置../，复写其中资源的路径
-      */
-      publicPath: '../' 
-    },
-    {
-      loader: 'css-loader',
-      options: {}
-    },
-    {
-      loader: 'less-loader',
-      options: {}
-    }
-  ]
-  ```
+
+      ```js
+      const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+      // ...
+      [
+        {
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+          /*
+          * 复写 css 文件中资源路径
+          * webpack3.x 配置在 extract-text-webpack-plugin 插件中
+          * 因为 css 文件中的外链是相对与 css 的，
+          * 我们抽离的 css 文件在可能会单独放在 css 文件夹内
+          * 引用其他如 img/a.png 会寻址错误
+          * 这种情况下所以单独需要配置 ../，复写其中资源的路径
+          */
+          publicPath: '../' 
+        },
+        {
+          loader: 'css-loader',
+          options: {}
+        },
+        {
+          loader: 'less-loader',
+          options: {}
+        }
+      ]
+      ```
 * plugin 部分
-  ```js
-  new MiniCssExtractPlugin({
-    // 输出到单独的 css 文件夹下
-    filename: "static/css/[name].[chunkhash].css"
-  })
-  ```
+
+      ```js
+      new MiniCssExtractPlugin({
+        // 输出到单独的 css 文件夹下
+        filename: "static/css/[name].[chunkhash].css"
+      })
+      ```
+
 可以看到这个 loader 也配置在了 css 预处理器部分，在前面我们已经把 css 预处理器的配置提取到了 utils.js 文件的函数内，所以这里也是，我们使用 `extract` 参数决定是否需要提取。
 
 回忆一下，之前使用的 `style-loader` 或 `vue-style-loader` 的作用，它们会创建标签将 css 的内容直接插入到 HTML中。而提取成独立的 css 文件之后，插入到 HTML 的工作由 `html-webpack-plugin` 插件完成，两者职责的这部分职责是重复的，所以我们需要使用 `extract` 参数做类似如下处理：
@@ -457,6 +464,7 @@ devServer: {
 ## 其他插件
 
 devServer 使用热更新 hot 时需要使用插件：
+
 ```js
 plugins: [
   new webpack.HotModuleReplacementPlugin()
