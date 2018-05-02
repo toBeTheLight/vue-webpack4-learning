@@ -498,7 +498,10 @@ plugins: [
 
 ## 配置提取
 
-针对开发模式和生产模式的一些功能启用（如 css 是否提取）、路径配置（文件输入路径和文件名）、服务配置（端口等），我们可以提取到独立的 config 文件中（本代码没做）。
+* 开发模式和生产模式的一些功能启用，如 css 是否提取。
+* 路径配置，如文件输出路径和文件名、output 中的 publicPath（代码 output 中只配置了 [path](https://webpack.js.org/configuration/output/#output-path)，没配置 [publicPath](https://webpack.js.org/configuration/output/#output-publicpath)，将这部分路径的 static 写到了各个资源的输出name中，可参考[Webpack中publicPath详解](https://juejin.im/post/5ae9ae5e518825672f19b094?utm_source=gold_browser_extension)）、服务配置如端口等。
+
+我们可以提取到独立的 config 文件中（本代码没做）。
 
 ## 拆分 js 代码
 
